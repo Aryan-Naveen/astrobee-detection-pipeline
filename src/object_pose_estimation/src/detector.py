@@ -9,7 +9,7 @@ import std_msgs.msg
 from rospkg import RosPack
 from std_msgs.msg import UInt8
 from sensor_msgs.msg import Image as ROSImage
-from vision_msgs.msg import Detection2DArray, Detection2D, ObjectHypothesisWithPose
+from msg import Detection2DArray, Detection2D, ObjectHypothesisWithPose
 from geometry_msgs.msg import Polygon, Point32
 
 
@@ -43,7 +43,7 @@ from pytorchyolo.models import load_model
 class DetectorManager():
     def __init__(self):
         # Load weights parameter
-        weights_name = rospy.get_param('~weights_name', 'yolov3_ckpt_150.pth')
+        weights_name = rospy.get_param('~weights_name', 'yolov3_ckpt_100.pth')
         self.weights_path = os.path.join(package_path, 'src/models/weights', weights_name)
         rospy.loginfo("Found weights, loading %s", self.weights_path)
 
@@ -52,7 +52,7 @@ class DetectorManager():
             raise IOError(('{:s} not found.').format(self.weights_path))
 
         # Load image parameter and confidence threshold
-        self.image_topic = rospy.get_param('~image_topic', '/mgt/img_sampler/nav_cam/image_record')
+        self.image_topic = rospy.get_param('~image_topic', '/sample_img')
         self.confidence_th = rospy.get_param('~confidence', 0.5)
         self.nms_th = rospy.get_param('~nms_th', 0.5)
         #
