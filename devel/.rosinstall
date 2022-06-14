@@ -1,2 +1,2 @@
 - setup-file:
-    local-name: /home/aryan/Documents/nasa_ws/astrobee-detection-pipeline/devel/setup.sh
+    local-name: /usr/local/home/anaveen/astrobee-detection-pipeline/devel/setup.sh

@@ -1,0 +1,5 @@
+<launch>
+	<node pkg= "rosbag" type = "play" name = "player" output="screen" args=" /usr/local/home/mgouveia/data/bags/20220513_Isaac8/bumble/fix_all/fix_all_20220513_1408_survey_jem_bay7_std_panorama.bag"/>
+	<node pkg= "object_pose_estimation" type = "detector.py" name= "detector_manager_node" output = "screen"/>
+	<node pkg= "object_pose_estimation" type = "visualize_dectections.py" name= "visualize_detections" output= "screen"/>
+</launch>
