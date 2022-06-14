@@ -1,0 +1,5 @@
+<launch>
+  <node pkg= "object_pose_estimation" type= "test_image_publisher.py" name= "sample_img_test_node" output="screen"/>
+  <node pkg= "object_pose_estimation" type= "detector.py" name= "detector_manager_node" output="screen"/>
+  <node pkg= "object_pose_estimation" type= "visualize_detections.py" name= "visualize_detections" output="screen"/>
+</launch>

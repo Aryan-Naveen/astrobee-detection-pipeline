@@ -127,3 +127,7 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+
+# Model Weights
+src/object_pose_estimation/src/models/weights/
