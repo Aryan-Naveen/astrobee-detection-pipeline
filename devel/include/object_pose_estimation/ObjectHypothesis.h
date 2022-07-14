@@ -66,6 +66,21 @@ ros::message_operations::Printer< ::object_pose_estimation::ObjectHypothesis_<Co
 return s;
 }
 
+
+template<typename ContainerAllocator1, typename ContainerAllocator2>
+bool operator==(const ::object_pose_estimation::ObjectHypothesis_<ContainerAllocator1> & lhs, const ::object_pose_estimation::ObjectHypothesis_<ContainerAllocator2> & rhs)
+{
+  return lhs.id == rhs.id &&
+    lhs.score == rhs.score;
+}
+
+template<typename ContainerAllocator1, typename ContainerAllocator2>
+bool operator!=(const ::object_pose_estimation::ObjectHypothesis_<ContainerAllocator1> & lhs, const ::object_pose_estimation::ObjectHypothesis_<ContainerAllocator2> & rhs)
+{
+  return !(lhs == rhs);
+}
+
+
 } // namespace object_pose_estimation
 
 namespace ros
@@ -75,23 +90,7 @@ namespace message_traits
 
 
 
-// BOOLTRAITS {'IsFixedSize': True, 'IsMessage': True, 'HasHeader': False}
-// {'sensor_msgs': ['/opt/ros/kinetic/share/sensor_msgs/cmake/../msg'], 'object_pose_estimation': ['/home/aryan/Documents/nasa_ws/astrobee-detection-pipeline/src/object_pose_estimation/msg'], 'std_msgs': ['/opt/ros/kinetic/share/std_msgs/cmake/../msg'], 'geometry_msgs': ['/opt/ros/kinetic/share/geometry_msgs/cmake/../msg']}
 
-// !!!!!!!!!!! ['__class__', '__delattr__', '__dict__', '__doc__', '__eq__', '__format__', '__getattribute__', '__hash__', '__init__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__str__', '__subclasshook__', '__weakref__', '_parsed_fields', 'constants', 'fields', 'full_name', 'has_header', 'header_present', 'names', 'package', 'parsed_fields', 'short_name', 'text', 'types']
-
-
-
-
-template <class ContainerAllocator>
-struct IsFixedSize< ::object_pose_estimation::ObjectHypothesis_<ContainerAllocator> >
-  : TrueType
-  { };
-
-template <class ContainerAllocator>
-struct IsFixedSize< ::object_pose_estimation::ObjectHypothesis_<ContainerAllocator> const>
-  : TrueType
-  { };
 
 template <class ContainerAllocator>
 struct IsMessage< ::object_pose_estimation::ObjectHypothesis_<ContainerAllocator> >
@@ -100,6 +99,16 @@ struct IsMessage< ::object_pose_estimation::ObjectHypothesis_<ContainerAllocator
 
 template <class ContainerAllocator>
 struct IsMessage< ::object_pose_estimation::ObjectHypothesis_<ContainerAllocator> const>
+  : TrueType
+  { };
+
+template <class ContainerAllocator>
+struct IsFixedSize< ::object_pose_estimation::ObjectHypothesis_<ContainerAllocator> >
+  : TrueType
+  { };
+
+template <class ContainerAllocator>
+struct IsFixedSize< ::object_pose_estimation::ObjectHypothesis_<ContainerAllocator> const>
   : TrueType
   { };
 
@@ -143,17 +152,17 @@ struct Definition< ::object_pose_estimation::ObjectHypothesis_<ContainerAllocato
 {
   static const char* value()
   {
-    return "# An object hypothesis that contains no position information.\n\
-\n\
-# The unique numeric ID of object detected. To get additional information about\n\
-#   this ID, such as its human-readable name, listeners should perform a lookup\n\
-#   in a metadata database. See vision_msgs/VisionInfo.msg for more detail.\n\
-int64 id\n\
-\n\
-# The probability or confidence value of the detected object. By convention,\n\
-#   this value should lie in the range [0-1].\n\
-float64 score\n\
-";
+    return "# An object hypothesis that contains no position information.\n"
+"\n"
+"# The unique numeric ID of object detected. To get additional information about\n"
+"#   this ID, such as its human-readable name, listeners should perform a lookup\n"
+"#   in a metadata database. See vision_msgs/VisionInfo.msg for more detail.\n"
+"int64 id\n"
+"\n"
+"# The probability or confidence value of the detected object. By convention,\n"
+"#   this value should lie in the range [0-1].\n"
+"float64 score\n"
+;
   }
 
   static const char* value(const ::object_pose_estimation::ObjectHypothesis_<ContainerAllocator>&) { return value(); }

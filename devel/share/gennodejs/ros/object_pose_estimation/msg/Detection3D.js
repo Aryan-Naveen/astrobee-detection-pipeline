@@ -13,8 +13,8 @@ const _finder = _ros_msg_utils.Find;
 const _getByteLength = _ros_msg_utils.getByteLength;
 let ObjectHypothesisWithPose = require('./ObjectHypothesisWithPose.js');
 let BoundingBox3D = require('./BoundingBox3D.js');
-let sensor_msgs = _finder('sensor_msgs');
 let std_msgs = _finder('std_msgs');
+let sensor_msgs = _finder('sensor_msgs');
 
 //-----------------------------------------------------------
 
@@ -147,8 +147,6 @@ class Detection3D {
     # time-handling sugar is provided by the client library
     time stamp
     #Frame this data is associated with
-    # 0: no frame
-    # 1: global frame
     string frame_id
     
     ================================================================================

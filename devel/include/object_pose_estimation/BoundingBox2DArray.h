@@ -68,6 +68,21 @@ ros::message_operations::Printer< ::object_pose_estimation::BoundingBox2DArray_<
 return s;
 }
 
+
+template<typename ContainerAllocator1, typename ContainerAllocator2>
+bool operator==(const ::object_pose_estimation::BoundingBox2DArray_<ContainerAllocator1> & lhs, const ::object_pose_estimation::BoundingBox2DArray_<ContainerAllocator2> & rhs)
+{
+  return lhs.header == rhs.header &&
+    lhs.boxes == rhs.boxes;
+}
+
+template<typename ContainerAllocator1, typename ContainerAllocator2>
+bool operator!=(const ::object_pose_estimation::BoundingBox2DArray_<ContainerAllocator1> & lhs, const ::object_pose_estimation::BoundingBox2DArray_<ContainerAllocator2> & rhs)
+{
+  return !(lhs == rhs);
+}
+
+
 } // namespace object_pose_estimation
 
 namespace ros
@@ -77,23 +92,7 @@ namespace message_traits
 
 
 
-// BOOLTRAITS {'IsFixedSize': False, 'IsMessage': True, 'HasHeader': True}
-// {'sensor_msgs': ['/opt/ros/kinetic/share/sensor_msgs/cmake/../msg'], 'object_pose_estimation': ['/home/aryan/Documents/nasa_ws/astrobee-detection-pipeline/src/object_pose_estimation/msg'], 'std_msgs': ['/opt/ros/kinetic/share/std_msgs/cmake/../msg'], 'geometry_msgs': ['/opt/ros/kinetic/share/geometry_msgs/cmake/../msg']}
 
-// !!!!!!!!!!! ['__class__', '__delattr__', '__dict__', '__doc__', '__eq__', '__format__', '__getattribute__', '__hash__', '__init__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__str__', '__subclasshook__', '__weakref__', '_parsed_fields', 'constants', 'fields', 'full_name', 'has_header', 'header_present', 'names', 'package', 'parsed_fields', 'short_name', 'text', 'types']
-
-
-
-
-template <class ContainerAllocator>
-struct IsFixedSize< ::object_pose_estimation::BoundingBox2DArray_<ContainerAllocator> >
-  : FalseType
-  { };
-
-template <class ContainerAllocator>
-struct IsFixedSize< ::object_pose_estimation::BoundingBox2DArray_<ContainerAllocator> const>
-  : FalseType
-  { };
 
 template <class ContainerAllocator>
 struct IsMessage< ::object_pose_estimation::BoundingBox2DArray_<ContainerAllocator> >
@@ -103,6 +102,16 @@ struct IsMessage< ::object_pose_estimation::BoundingBox2DArray_<ContainerAllocat
 template <class ContainerAllocator>
 struct IsMessage< ::object_pose_estimation::BoundingBox2DArray_<ContainerAllocator> const>
   : TrueType
+  { };
+
+template <class ContainerAllocator>
+struct IsFixedSize< ::object_pose_estimation::BoundingBox2DArray_<ContainerAllocator> >
+  : FalseType
+  { };
+
+template <class ContainerAllocator>
+struct IsFixedSize< ::object_pose_estimation::BoundingBox2DArray_<ContainerAllocator> const>
+  : FalseType
   { };
 
 template <class ContainerAllocator>
@@ -145,59 +154,57 @@ struct Definition< ::object_pose_estimation::BoundingBox2DArray_<ContainerAlloca
 {
   static const char* value()
   {
-    return "std_msgs/Header header\n\
-object_pose_estimation/BoundingBox2D[] boxes\n\
-\n\
-================================================================================\n\
-MSG: std_msgs/Header\n\
-# Standard metadata for higher-level stamped data types.\n\
-# This is generally used to communicate timestamped data \n\
-# in a particular coordinate frame.\n\
-# \n\
-# sequence ID: consecutively increasing ID \n\
-uint32 seq\n\
-#Two-integer timestamp that is expressed as:\n\
-# * stamp.sec: seconds (stamp_secs) since epoch (in Python the variable is called 'secs')\n\
-# * stamp.nsec: nanoseconds since stamp_secs (in Python the variable is called 'nsecs')\n\
-# time-handling sugar is provided by the client library\n\
-time stamp\n\
-#Frame this data is associated with\n\
-# 0: no frame\n\
-# 1: global frame\n\
-string frame_id\n\
-\n\
-================================================================================\n\
-MSG: object_pose_estimation/BoundingBox2D\n\
-# A 2D bounding box that can be rotated about its center.\n\
-# All dimensions are in pixels, but represented using floating-point\n\
-#   values to allow sub-pixel precision. If an exact pixel crop is required\n\
-#   for a rotated bounding box, it can be calculated using Bresenham's line\n\
-#   algorithm.\n\
-\n\
-# The 2D position (in pixels) and orientation of the bounding box center.\n\
-geometry_msgs/Pose2D center\n\
-\n\
-# The size (in pixels) of the bounding box surrounding the object relative\n\
-#   to the pose of its center.\n\
-float64 size_x\n\
-float64 size_y\n\
-\n\
-================================================================================\n\
-MSG: geometry_msgs/Pose2D\n\
-# Deprecated\n\
-# Please use the full 3D pose.\n\
-\n\
-# In general our recommendation is to use a full 3D representation of everything and for 2D specific applications make the appropriate projections into the plane for their calculations but optimally will preserve the 3D information during processing.\n\
-\n\
-# If we have parallel copies of 2D datatypes every UI and other pipeline will end up needing to have dual interfaces to plot everything. And you will end up with not being able to use 3D tools for 2D use cases even if they're completely valid, as you'd have to reimplement it with different inputs and outputs. It's not particularly hard to plot the 2D pose or compute the yaw error for the Pose message and there are already tools and libraries that can do this for you.\n\
-\n\
-\n\
-# This expresses a position and orientation on a 2D manifold.\n\
-\n\
-float64 x\n\
-float64 y\n\
-float64 theta\n\
-";
+    return "std_msgs/Header header\n"
+"object_pose_estimation/BoundingBox2D[] boxes\n"
+"\n"
+"================================================================================\n"
+"MSG: std_msgs/Header\n"
+"# Standard metadata for higher-level stamped data types.\n"
+"# This is generally used to communicate timestamped data \n"
+"# in a particular coordinate frame.\n"
+"# \n"
+"# sequence ID: consecutively increasing ID \n"
+"uint32 seq\n"
+"#Two-integer timestamp that is expressed as:\n"
+"# * stamp.sec: seconds (stamp_secs) since epoch (in Python the variable is called 'secs')\n"
+"# * stamp.nsec: nanoseconds since stamp_secs (in Python the variable is called 'nsecs')\n"
+"# time-handling sugar is provided by the client library\n"
+"time stamp\n"
+"#Frame this data is associated with\n"
+"string frame_id\n"
+"\n"
+"================================================================================\n"
+"MSG: object_pose_estimation/BoundingBox2D\n"
+"# A 2D bounding box that can be rotated about its center.\n"
+"# All dimensions are in pixels, but represented using floating-point\n"
+"#   values to allow sub-pixel precision. If an exact pixel crop is required\n"
+"#   for a rotated bounding box, it can be calculated using Bresenham's line\n"
+"#   algorithm.\n"
+"\n"
+"# The 2D position (in pixels) and orientation of the bounding box center.\n"
+"geometry_msgs/Pose2D center\n"
+"\n"
+"# The size (in pixels) of the bounding box surrounding the object relative\n"
+"#   to the pose of its center.\n"
+"float64 size_x\n"
+"float64 size_y\n"
+"\n"
+"================================================================================\n"
+"MSG: geometry_msgs/Pose2D\n"
+"# Deprecated\n"
+"# Please use the full 3D pose.\n"
+"\n"
+"# In general our recommendation is to use a full 3D representation of everything and for 2D specific applications make the appropriate projections into the plane for their calculations but optimally will preserve the 3D information during processing.\n"
+"\n"
+"# If we have parallel copies of 2D datatypes every UI and other pipeline will end up needing to have dual interfaces to plot everything. And you will end up with not being able to use 3D tools for 2D use cases even if they're completely valid, as you'd have to reimplement it with different inputs and outputs. It's not particularly hard to plot the 2D pose or compute the yaw error for the Pose message and there are already tools and libraries that can do this for you.\n"
+"\n"
+"\n"
+"# This expresses a position and orientation on a 2D manifold.\n"
+"\n"
+"float64 x\n"
+"float64 y\n"
+"float64 theta\n"
+;
   }
 
   static const char* value(const ::object_pose_estimation::BoundingBox2DArray_<ContainerAllocator>&) { return value(); }

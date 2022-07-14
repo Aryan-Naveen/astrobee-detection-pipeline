@@ -24,7 +24,7 @@
   (:init
    (&key
     ((:header __header) (instance std_msgs::Header :init))
-    ((:results __results) (let (r) (dotimes (i 0) (push (instance object_pose_estimation::ObjectHypothesis :init) r)) r))
+    ((:results __results) ())
     ((:source_img __source_img) (instance sensor_msgs::Image :init))
     )
    (send-super :init)
@@ -127,8 +127,6 @@ uint32 seq
 # time-handling sugar is provided by the client library
 time stamp
 #Frame this data is associated with
-# 0: no frame
-# 1: global frame
 string frame_id
 
 ================================================================================

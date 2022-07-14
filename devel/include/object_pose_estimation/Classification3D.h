@@ -74,6 +74,22 @@ ros::message_operations::Printer< ::object_pose_estimation::Classification3D_<Co
 return s;
 }
 
+
+template<typename ContainerAllocator1, typename ContainerAllocator2>
+bool operator==(const ::object_pose_estimation::Classification3D_<ContainerAllocator1> & lhs, const ::object_pose_estimation::Classification3D_<ContainerAllocator2> & rhs)
+{
+  return lhs.header == rhs.header &&
+    lhs.results == rhs.results &&
+    lhs.source_cloud == rhs.source_cloud;
+}
+
+template<typename ContainerAllocator1, typename ContainerAllocator2>
+bool operator!=(const ::object_pose_estimation::Classification3D_<ContainerAllocator1> & lhs, const ::object_pose_estimation::Classification3D_<ContainerAllocator2> & rhs)
+{
+  return !(lhs == rhs);
+}
+
+
 } // namespace object_pose_estimation
 
 namespace ros
@@ -83,23 +99,7 @@ namespace message_traits
 
 
 
-// BOOLTRAITS {'IsFixedSize': False, 'IsMessage': True, 'HasHeader': True}
-// {'sensor_msgs': ['/opt/ros/kinetic/share/sensor_msgs/cmake/../msg'], 'object_pose_estimation': ['/home/aryan/Documents/nasa_ws/astrobee-detection-pipeline/src/object_pose_estimation/msg'], 'std_msgs': ['/opt/ros/kinetic/share/std_msgs/cmake/../msg'], 'geometry_msgs': ['/opt/ros/kinetic/share/geometry_msgs/cmake/../msg']}
 
-// !!!!!!!!!!! ['__class__', '__delattr__', '__dict__', '__doc__', '__eq__', '__format__', '__getattribute__', '__hash__', '__init__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__str__', '__subclasshook__', '__weakref__', '_parsed_fields', 'constants', 'fields', 'full_name', 'has_header', 'header_present', 'names', 'package', 'parsed_fields', 'short_name', 'text', 'types']
-
-
-
-
-template <class ContainerAllocator>
-struct IsFixedSize< ::object_pose_estimation::Classification3D_<ContainerAllocator> >
-  : FalseType
-  { };
-
-template <class ContainerAllocator>
-struct IsFixedSize< ::object_pose_estimation::Classification3D_<ContainerAllocator> const>
-  : FalseType
-  { };
 
 template <class ContainerAllocator>
 struct IsMessage< ::object_pose_estimation::Classification3D_<ContainerAllocator> >
@@ -109,6 +109,16 @@ struct IsMessage< ::object_pose_estimation::Classification3D_<ContainerAllocator
 template <class ContainerAllocator>
 struct IsMessage< ::object_pose_estimation::Classification3D_<ContainerAllocator> const>
   : TrueType
+  { };
+
+template <class ContainerAllocator>
+struct IsFixedSize< ::object_pose_estimation::Classification3D_<ContainerAllocator> >
+  : FalseType
+  { };
+
+template <class ContainerAllocator>
+struct IsFixedSize< ::object_pose_estimation::Classification3D_<ContainerAllocator> const>
+  : FalseType
   { };
 
 template <class ContainerAllocator>
@@ -151,98 +161,96 @@ struct Definition< ::object_pose_estimation::Classification3D_<ContainerAllocato
 {
   static const char* value()
   {
-    return "# Defines a 3D classification result.\n\
-#\n\
-# This result does not contain any position information. It is designed for\n\
-#   classifiers, which simply provide probabilities given a source image.\n\
-\n\
-Header header\n\
-\n\
-# Class probabilities\n\
-ObjectHypothesis[] results\n\
-\n\
-# The 3D data that generated these results (i.e. region proposal cropped out of\n\
-#   the image). Not required for all detectors, so it may be empty.\n\
-sensor_msgs/PointCloud2 source_cloud\n\
-\n\
-================================================================================\n\
-MSG: std_msgs/Header\n\
-# Standard metadata for higher-level stamped data types.\n\
-# This is generally used to communicate timestamped data \n\
-# in a particular coordinate frame.\n\
-# \n\
-# sequence ID: consecutively increasing ID \n\
-uint32 seq\n\
-#Two-integer timestamp that is expressed as:\n\
-# * stamp.sec: seconds (stamp_secs) since epoch (in Python the variable is called 'secs')\n\
-# * stamp.nsec: nanoseconds since stamp_secs (in Python the variable is called 'nsecs')\n\
-# time-handling sugar is provided by the client library\n\
-time stamp\n\
-#Frame this data is associated with\n\
-# 0: no frame\n\
-# 1: global frame\n\
-string frame_id\n\
-\n\
-================================================================================\n\
-MSG: object_pose_estimation/ObjectHypothesis\n\
-# An object hypothesis that contains no position information.\n\
-\n\
-# The unique numeric ID of object detected. To get additional information about\n\
-#   this ID, such as its human-readable name, listeners should perform a lookup\n\
-#   in a metadata database. See vision_msgs/VisionInfo.msg for more detail.\n\
-int64 id\n\
-\n\
-# The probability or confidence value of the detected object. By convention,\n\
-#   this value should lie in the range [0-1].\n\
-float64 score\n\
-================================================================================\n\
-MSG: sensor_msgs/PointCloud2\n\
-# This message holds a collection of N-dimensional points, which may\n\
-# contain additional information such as normals, intensity, etc. The\n\
-# point data is stored as a binary blob, its layout described by the\n\
-# contents of the \"fields\" array.\n\
-\n\
-# The point cloud data may be organized 2d (image-like) or 1d\n\
-# (unordered). Point clouds organized as 2d images may be produced by\n\
-# camera depth sensors such as stereo or time-of-flight.\n\
-\n\
-# Time of sensor data acquisition, and the coordinate frame ID (for 3d\n\
-# points).\n\
-Header header\n\
-\n\
-# 2D structure of the point cloud. If the cloud is unordered, height is\n\
-# 1 and width is the length of the point cloud.\n\
-uint32 height\n\
-uint32 width\n\
-\n\
-# Describes the channels and their layout in the binary data blob.\n\
-PointField[] fields\n\
-\n\
-bool    is_bigendian # Is this data bigendian?\n\
-uint32  point_step   # Length of a point in bytes\n\
-uint32  row_step     # Length of a row in bytes\n\
-uint8[] data         # Actual point data, size is (row_step*height)\n\
-\n\
-bool is_dense        # True if there are no invalid points\n\
-\n\
-================================================================================\n\
-MSG: sensor_msgs/PointField\n\
-# This message holds the description of one point entry in the\n\
-# PointCloud2 message format.\n\
-uint8 INT8    = 1\n\
-uint8 UINT8   = 2\n\
-uint8 INT16   = 3\n\
-uint8 UINT16  = 4\n\
-uint8 INT32   = 5\n\
-uint8 UINT32  = 6\n\
-uint8 FLOAT32 = 7\n\
-uint8 FLOAT64 = 8\n\
-\n\
-string name      # Name of field\n\
-uint32 offset    # Offset from start of point struct\n\
-uint8  datatype  # Datatype enumeration, see above\n\
-uint32 count     # How many elements in the field\n\
-";
+    return "# Defines a 3D classification result.\n"
+"#\n"
+"# This result does not contain any position information. It is designed for\n"
+"#   classifiers, which simply provide probabilities given a source image.\n"
+"\n"
+"Header header\n"
+"\n"
+"# Class probabilities\n"
+"ObjectHypothesis[] results\n"
+"\n"
+"# The 3D data that generated these results (i.e. region proposal cropped out of\n"
+"#   the image). Not required for all detectors, so it may be empty.\n"
+"sensor_msgs/PointCloud2 source_cloud\n"
+"\n"
+"================================================================================\n"
+"MSG: std_msgs/Header\n"
+"# Standard metadata for higher-level stamped data types.\n"
+"# This is generally used to communicate timestamped data \n"
+"# in a particular coordinate frame.\n"
+"# \n"
+"# sequence ID: consecutively increasing ID \n"
+"uint32 seq\n"
+"#Two-integer timestamp that is expressed as:\n"
+"# * stamp.sec: seconds (stamp_secs) since epoch (in Python the variable is called 'secs')\n"
+"# * stamp.nsec: nanoseconds since stamp_secs (in Python the variable is called 'nsecs')\n"
+"# time-handling sugar is provided by the client library\n"
+"time stamp\n"
+"#Frame this data is associated with\n"
+"string frame_id\n"
+"\n"
+"================================================================================\n"
+"MSG: object_pose_estimation/ObjectHypothesis\n"
+"# An object hypothesis that contains no position information.\n"
+"\n"
+"# The unique numeric ID of object detected. To get additional information about\n"
+"#   this ID, such as its human-readable name, listeners should perform a lookup\n"
+"#   in a metadata database. See vision_msgs/VisionInfo.msg for more detail.\n"
+"int64 id\n"
+"\n"
+"# The probability or confidence value of the detected object. By convention,\n"
+"#   this value should lie in the range [0-1].\n"
+"float64 score\n"
+"================================================================================\n"
+"MSG: sensor_msgs/PointCloud2\n"
+"# This message holds a collection of N-dimensional points, which may\n"
+"# contain additional information such as normals, intensity, etc. The\n"
+"# point data is stored as a binary blob, its layout described by the\n"
+"# contents of the \"fields\" array.\n"
+"\n"
+"# The point cloud data may be organized 2d (image-like) or 1d\n"
+"# (unordered). Point clouds organized as 2d images may be produced by\n"
+"# camera depth sensors such as stereo or time-of-flight.\n"
+"\n"
+"# Time of sensor data acquisition, and the coordinate frame ID (for 3d\n"
+"# points).\n"
+"Header header\n"
+"\n"
+"# 2D structure of the point cloud. If the cloud is unordered, height is\n"
+"# 1 and width is the length of the point cloud.\n"
+"uint32 height\n"
+"uint32 width\n"
+"\n"
+"# Describes the channels and their layout in the binary data blob.\n"
+"PointField[] fields\n"
+"\n"
+"bool    is_bigendian # Is this data bigendian?\n"
+"uint32  point_step   # Length of a point in bytes\n"
+"uint32  row_step     # Length of a row in bytes\n"
+"uint8[] data         # Actual point data, size is (row_step*height)\n"
+"\n"
+"bool is_dense        # True if there are no invalid points\n"
+"\n"
+"================================================================================\n"
+"MSG: sensor_msgs/PointField\n"
+"# This message holds the description of one point entry in the\n"
+"# PointCloud2 message format.\n"
+"uint8 INT8    = 1\n"
+"uint8 UINT8   = 2\n"
+"uint8 INT16   = 3\n"
+"uint8 UINT16  = 4\n"
+"uint8 INT32   = 5\n"
+"uint8 UINT32  = 6\n"
+"uint8 FLOAT32 = 7\n"
+"uint8 FLOAT64 = 8\n"
+"\n"
+"string name      # Name of field\n"
+"uint32 offset    # Offset from start of point struct\n"
+"uint8  datatype  # Datatype enumeration, see above\n"
+"uint32 count     # How many elements in the field\n"
+;
   }
 
   static const char* value(const ::object_pose_estimation::Classification3D_<ContainerAllocator>&) { return value(); }

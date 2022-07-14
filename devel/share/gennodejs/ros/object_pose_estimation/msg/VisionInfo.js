@@ -83,8 +83,8 @@ class VisionInfo {
   static getMessageSize(object) {
     let length = 0;
     length += std_msgs.msg.Header.getMessageSize(object.header);
-    length += object.method.length;
-    length += object.database_location.length;
+    length += _getByteLength(object.method);
+    length += _getByteLength(object.database_location);
     return length + 12;
   }
 
@@ -155,8 +155,6 @@ class VisionInfo {
     # time-handling sugar is provided by the client library
     time stamp
     #Frame this data is associated with
-    # 0: no frame
-    # 1: global frame
     string frame_id
     
     `;
