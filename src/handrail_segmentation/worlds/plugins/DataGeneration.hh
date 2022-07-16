@@ -20,6 +20,8 @@
 #include <chrono>
 #include <ignition/gazebo/System.hh>
 #include <thread>
+#include <vector>
+#include <ignition/gazebo/SdfEntityCreator.hh>
 
 namespace data_generation
 {
@@ -48,11 +50,21 @@ namespace data_generation
 
     /// \brief Actor entity
     private: ignition::gazebo::Entity entity;
+    private: ignition::gazebo::EntityComponentManager ecm;
+    private: ignition::gazebo::EventManager eventMgr;
+    private: ignition::gazebo::SdfEntityCreator entityCreator = ignition::gazebo::SdfEntityCreator(ecm, eventMgr);
 
     private: int lastPositionChange{0};
 
-    private: ignition::math::Pose3d handrailInspectPose = ignition::math::Pose3d(4.01, 0.5, 4.8, 0, 1.57, 0);
-    
+    private: std::vector<ignition::math::Pose3d> handrailInspectPositions;
+
+    private: int NUM_IMAGES_EACH = 1;
+
+    private: int n_count = 0;
+
+
+
+
   };
 }
 
