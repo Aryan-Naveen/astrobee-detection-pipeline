@@ -131,3 +131,6 @@ dmypy.json
 
 # Model Weights
 src/object_pose_estimation/src/models/weights/
+
+#Generated Data
+src/handrail_segmentation/worlds/data/
