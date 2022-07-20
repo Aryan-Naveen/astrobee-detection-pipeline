@@ -1,7 +1,7 @@
 import os
 import numpy as np
 import torch
-from PIL import Image
+from PIL import Image, ImageOps
 
 
 class AstrobeeHandrailDataset(torch.utils.data.Dataset):
@@ -21,7 +21,8 @@ class AstrobeeHandrailDataset(torch.utils.data.Dataset):
         # note that we haven't converted the mask to RGB,
         # because each color corresponds to a different instance
         # with 0 being background
-        mask = Image.open(mask_path)
+
+        mask = ImageOps.grayscale(Image.open(mask_path))
         # convert the PIL Image into a numpy array
         mask = np.array(mask)
         # instances are encoded as different colors
@@ -31,9 +32,7 @@ class AstrobeeHandrailDataset(torch.utils.data.Dataset):
 
         # split the color-encoded mask into a set
         # of binary masks
-        masks = []
-        for obj in obj_ids[:, None, None]:
-            masks.append(mask == obj[0])
+        masks = mask == obj_ids[:, None, None]
 
         # get bounding box coordinates for each mask
         num_objs = len(obj_ids)

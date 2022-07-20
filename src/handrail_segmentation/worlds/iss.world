@@ -239,15 +239,15 @@
           <segmentation_type>semantic</segmentation_type>
           <horizontal_fov>1.57</horizontal_fov>
           <image>
-            <width>1280</width>
-            <height>800</height>
+            <width>320</width>
+            <height>240</height>
           </image>
           <clip>
             <near>0.1</near>
             <far>20</far>
           </clip>
           <save enabled="true">
-            <path>data</path>
+            <path>/home/anaveen/Documents/nasa_ws/astrobee-detection-pipeline/src/handrail_segmentation/pytorch_mrcnn/data</path>
           </save>
         </camera>
         <always_on>1</always_on>
