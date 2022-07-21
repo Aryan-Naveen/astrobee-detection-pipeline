@@ -10,6 +10,7 @@ from PIL import Image
 import numpy as np
 
 from utils.visualize import visualize
+from tqdm import tqdm
 
 
 convert_tensor = transforms.ToTensor()
@@ -38,7 +39,7 @@ def get_trained_model(weights_path, num_classes = 5):
 
 def evaluate():
     parser = argparse.ArgumentParser(description="Evaluate validation data.")
-    parser.add_argument("-i", "--img_path", type=str, default="data/images/image_0000599.png", help="Path to image to evaluate on")
+    parser.add_argument("-i", "--img_directory", type=str, default="eval_data/", help="Path to image to evaluate on")
     parser.add_argument("-w", "--weights", type=str, default="checkpoints/yolov3_ckpt_140.pth")
     parser.add_argument("-n", "--nms_thesh", type=float, default=0.7)
     args = parser.parse_args()
@@ -48,18 +49,21 @@ def evaluate():
 
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
 
-    img = Image.open(args.img_path).convert("RGB")
-    img = [convert_tensor(img)]
-    torch.cuda.synchronize()
+    img_paths = list(sorted(os.listdir(os.path.join(args.img_directory, "images"))))
 
-    output = model(img)[0]
-    bbox = output['boxes'].detach().numpy().reshape(4,)
-    mask = output['masks'].detach().numpy().reshape(240, 320)
-    label = output['labels'].detach().numpy()[0]
-    np.place(mask, mask > args.nms_thesh, output['labels'][0])
-    np.place(mask, mask <= args.nms_thesh, 0)
+    for img_path in tqdm(img_paths):
+        img = Image.open(img_path).convert("RGB")
+        img = [convert_tensor(img)]
+        torch.cuda.synchronize()
 
-    visualize(args.img_path, bbox, mask, label)
+        output = model(img)[0]
+        bbox = output['boxes'].detach().numpy().reshape(4,)
+        mask = output['masks'].detach().numpy().reshape(240, 320)
+        label = output['labels'].detach().numpy()[0]
+        np.place(mask, mask > args.nms_thesh, output['labels'][0])
+        np.place(mask, mask <= args.nms_thesh, 0)
+
+        visualize(img_path, bbox, mask, label)
 
 
 if __name__=='__main__':
