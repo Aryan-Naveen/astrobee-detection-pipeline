@@ -129,13 +129,9 @@ def main():
             if lr_scheduler is not None:
                 lr_scheduler.step()
 
-            # ############
-            # Log progress
-            # ############
 
-
-        if epoch % params.checkpoint_interval == 0:
-            checkpoint_path = f"checkpoints/yolov3_ckpt_{epoch}.pth"
+        if epoch % params.checkpoint_interval == 0 or epoch == num_epochs - 1:
+            checkpoint_path = f"checkpoints/mrcnn_ckpt_{epoch}.pth"
             print(f"---- Saving checkpoint to: '{checkpoint_path}' ----")
             torch.save(model.state_dict(), checkpoint_path)
             evaluate(model, data_loader_test, device=device)
