@@ -31,7 +31,7 @@ def visualize(image, bbox, mask, label):
     return cv2.rectangle(colored_image, (int(np.floor(bbox[0])), int(np.floor(bbox[1]))), (int(np.ceil(bbox[2])), int(np.ceil(bbox[3]))), coloring_scheme[label], 1)
 
 
-def save_image(annotated_img, image_path):
+def save_image(annotated_img, img_path):
     path_save = 'data_eval/output/'
     imageId = 'segmentation_' + os.path.splitext(img_path)[0][-7:] + '.png'
     if not cv2.imwrite(path_save + imageId, annotated_img):

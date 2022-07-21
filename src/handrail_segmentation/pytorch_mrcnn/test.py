@@ -12,6 +12,7 @@ import numpy as np
 from utils.visualize import visualize, save_image
 from tqdm import tqdm
 import os
+import cv2
 
 convert_tensor = transforms.ToTensor()
 
@@ -43,7 +44,7 @@ def filter_preds(bboxs, masks, labels, scores, thresh=0.7):
     for bbox, mask, label, score in zip(bboxs, masks, labels, scores):
         if score > thresh:
             f_bboxs.append(bbox.reshape(4,))
-            f_masks.append(mask.shape(240, 320))
+            f_masks.append(mask.reshape(240, 320))
             f_labels.append(label)
 
     return f_bboxs, f_masks, f_labels
@@ -61,11 +62,9 @@ def evaluate():
 
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
 
-#    img_paths = [os.path.join(args.img_directory, img_name) for img_name in list(sorted(os.listdir(args.img_directory)))]
-    img_paths = ['data_eval/images/image_0000002.png']
+    img_paths = [os.path.join(args.img_directory, img_name) for img_name in list(sorted(os.listdir(args.img_directory)))]
 
     for img_path in tqdm(img_paths):
-        print(img_path)
         img = Image.open(img_path).convert("RGB")
         img = [convert_tensor(img)]
         torch.cuda.synchronize()
@@ -88,7 +87,7 @@ def evaluate():
 
             annotated_img = visualize(annotated_img, bbox, mask, label)
 
-        save_image(annotated_img, image_path)
+        save_image(annotated_img, img_path)
 
 if __name__=='__main__':
     evaluate()
