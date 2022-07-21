@@ -12,6 +12,7 @@ class AstrobeeHandrailDataset(torch.utils.data.Dataset):
         # ensure that they are aligned
         self.imgs = list(sorted(os.listdir(os.path.join(root, "images"))))
         self.masks = list(sorted(os.listdir(os.path.join(root, "colored_maps"))))
+	self.label_dict = {39: 1, 137: 2, 102: 3, 85: 4}
 
     def __getitem__(self, idx):
         # load images and masks
@@ -29,6 +30,7 @@ class AstrobeeHandrailDataset(torch.utils.data.Dataset):
         obj_ids = np.unique(mask)
         # first id is the background, so remove it
         obj_ids = obj_ids[1:]
+        print(obj_ids)
 
         # split the color-encoded mask into a set
         # of binary masks
@@ -37,6 +39,7 @@ class AstrobeeHandrailDataset(torch.utils.data.Dataset):
         # get bounding box coordinates for each mask
         num_objs = len(obj_ids)
         boxes = []
+        labels = []
         for i in range(num_objs):
             pos =  np.where(masks[i])
             xmin = np.min(pos[1])
@@ -45,11 +48,12 @@ class AstrobeeHandrailDataset(torch.utils.data.Dataset):
             ymax = np.max(pos[0])
             if (ymax - ymin) > 0 and (xmax - xmin) > 0:
                 boxes.append([xmin, ymin, xmax, ymax])
+                labels.append(self.label_dict[obj_ids[i]])
 
         # convert everything into a torch.Tensor
         boxes = torch.as_tensor(boxes, dtype=torch.float32)
         # there is only one class
-        labels = torch.ones((num_objs,), dtype=torch.int64)
+        labels = torch.as_tensor(np.array(labels), dtype=torch.int64)
         masks = torch.as_tensor(masks, dtype=torch.uint8)
 
         image_id = torch.tensor([idx])
