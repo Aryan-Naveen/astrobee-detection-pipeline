@@ -8,10 +8,12 @@ import argparse
 
 from PIL import Image
 
-def get_trained_model(weights_path):
+def get_trained_model(weights_path, num_classes = 5):
     # load an instance segmentation model pre-trained on COCO
     model = torchvision.models.detection.maskrcnn_resnet50_fpn()
     # replace the pre-trained head with a new one
+    # get number of input features for the classifier
+    in_features = model.roi_heads.box_predictor.cls_score.in_features
     model.roi_heads.box_predictor = FastRCNNPredictor(in_features, num_classes)
 
     # now get the number of input features for the mask classifier
