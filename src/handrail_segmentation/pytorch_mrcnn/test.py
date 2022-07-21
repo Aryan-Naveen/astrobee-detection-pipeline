@@ -53,6 +53,7 @@ def evaluate():
     bbox = output['boxes']
     mask = output['masks'].detach().numpy().reshape(240, 320)
     np.place(mask, mask > args.nms_thesh, output['labels'][0])
+    np.place(mask, mask <= args.nms_thesh, 0)
     print(np.unique(mask))
 
 
