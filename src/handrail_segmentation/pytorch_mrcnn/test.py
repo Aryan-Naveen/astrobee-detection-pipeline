@@ -37,6 +37,7 @@ def evaluate():
     parser = argparse.ArgumentParser(description="Evaluate validation data.")
     parser.add_argument("-i", "--img_path", type=str, default="data/images/image_0000599.png", help="Path to image to evaluate on")
     parser.add_argument("-w", "--weights", type=str, default="checkpoints/yolov3_ckpt_140.pth")
+    parser.add_argument("-n", "--nms_thesh", type=float, default=0.7)
     args = parser.parse_args()
 
     model = get_trained_model(args.weights)
@@ -48,10 +49,10 @@ def evaluate():
     img = [convert_tensor(img)]
     torch.cuda.synchronize()
 
-    output = model(img)
-    bbox = output[0]['boxes']
-    mask = output[0]['masks'].detach().numpy()
-    print(mask.shape)
+    output = model(img)[0]
+    bbox = output['boxes']
+    mask = output['masks'].detach().numpy().reshape(240, 320)
+    np.place(mask, mask > args.nms_thesh, output['labels'][0])
     print(np.unique(mask))
 
 
