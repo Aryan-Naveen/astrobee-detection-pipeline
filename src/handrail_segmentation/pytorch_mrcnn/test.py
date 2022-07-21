@@ -7,6 +7,7 @@ from torchvision import transforms
 import argparse
 
 from PIL import Image
+import numpy as np
 
 convert_tensor = transforms.ToTensor()
 
@@ -46,7 +47,12 @@ def evaluate():
     img = Image.open(args.img_path).convert("RGB")
     img = [convert_tensor(img)]
     torch.cuda.synchronize()
-    print(model(img))
+
+    output = model(img)
+    bbox = output['boxes']
+    mask = output['masks']
+    print(mask.shape)
+    print(np.max(mask))
 
 
 if __name__=='__main__':
