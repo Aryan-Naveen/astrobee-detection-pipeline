@@ -24,12 +24,14 @@ def convert_mask_to_image(mask, label):
     return colored_map
 
 
-def visualize(img_path, bbox, mask, label):
-    image = cv2.imread(img_path, cv2.IMREAD_COLOR)
+def visualize(image, bbox, mask, label):
+    # image = cv2.imread(img_path, cv2.IMREAD_COLOR)
     colored_map = convert_mask_to_image(mask, label)
     colored_image = add_colored_to_image(image, colored_map)
-    annotated_img = cv2.rectangle(colored_image, (int(np.floor(bbox[0])), int(np.floor(bbox[1]))), (int(np.ceil(bbox[2])), int(np.ceil(bbox[3]))), coloring_scheme[label], 1)
+    return cv2.rectangle(colored_image, (int(np.floor(bbox[0])), int(np.floor(bbox[1]))), (int(np.ceil(bbox[2])), int(np.ceil(bbox[3]))), coloring_scheme[label], 1)
 
+
+def save_image(annotated_img, image_path):
     path_save = 'data_eval/output/'
     imageId = 'segmentation_' + os.path.splitext(img_path)[0][-7:] + '.png'
     if not cv2.imwrite(path_save + imageId, annotated_img):

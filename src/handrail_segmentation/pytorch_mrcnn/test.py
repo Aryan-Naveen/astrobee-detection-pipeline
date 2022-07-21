@@ -9,7 +9,7 @@ import argparse
 from PIL import Image
 import numpy as np
 
-from utils.visualize import visualize
+from utils.visualize import visualize, save_image
 from tqdm import tqdm
 import os
 
@@ -71,7 +71,7 @@ def evaluate():
         torch.cuda.synchronize()
 
         output = model(img)[0]
-	num_detections = len(output['labels'])
+	    num_detections = len(output['labels'])
 
         bboxs = output['boxes'].detach().numpy()
         masks = output['masks'].detach().numpy()
@@ -79,11 +79,16 @@ def evaluate():
         scores = output['scores'].detach().numpy()
 
         bboxs, masks, labels = filter_preds(bboxs, masks, labels, scores)
-        np.place(mask, mask > args.nms_thesh, output['labels'][0])
-        np.place(mask, mask <= args.nms_thesh, 0)
 
-        visualize(img_path, bbox, mask, label)
+        annotated_img = cv2.imread(img_path, cv2.IMREAD_COLOR)
 
+        for bbox, mask, label in zip(bboxs, masks, labels):
+            np.place(mask, mask > args.nms_thesh, output['labels'][0])
+            np.place(mask, mask <= args.nms_thesh, 0)
+
+            annotated_img = visualize(annotated_img, bbox, mask, label)
+
+        save_image(annotated_img, image_path)
 
 if __name__=='__main__':
     evaluate()
