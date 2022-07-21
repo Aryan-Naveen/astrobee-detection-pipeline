@@ -49,10 +49,10 @@ def evaluate():
     torch.cuda.synchronize()
 
     output = model(img)
-    bbox = output['boxes']
-    mask = output['masks']
+    bbox = output[0]['boxes']
+    mask = output[0]['masks']
     print(mask.shape)
-    print(np.max(mask))
+    print(np.unique(mask))
 
 
 if __name__=='__main__':
