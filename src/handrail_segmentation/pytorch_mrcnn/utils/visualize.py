@@ -17,9 +17,9 @@ def convert_mask_to_image(mask, label):
                        2: [0, 200, 172],
                        3: [0, 106, 200],
                        4: [0, 173, 2]}
-    colored_maps = np.array(Image.from_array(mask).convert("RGB"))
+    colored_maps = np.array(Image.fromarray(mask).convert("RGB"))
     colored_maps[np.where(mask == label)] = coloring_scheme[label]
-    return Image.from_array(colored_maps)
+    return Image.fromarray(colored_maps)
 
 
 def visualize(img_path, bbox, mask, label):
