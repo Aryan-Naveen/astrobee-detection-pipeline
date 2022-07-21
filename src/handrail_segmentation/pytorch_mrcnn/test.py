@@ -53,7 +53,7 @@ def evaluate():
     torch.cuda.synchronize()
 
     output = model(img)[0]
-    bbox = output['boxes']
+    bbox = output['boxes'].detach().numpy().reshape(4,)
     mask = output['masks'].detach().numpy().reshape(240, 320)
     label = output['labels'].detach().numpy()[0]
     np.place(mask, mask > args.nms_thesh, output['labels'][0])
