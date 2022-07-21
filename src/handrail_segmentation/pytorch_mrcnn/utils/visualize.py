@@ -17,14 +17,14 @@ def convert_mask_to_image(mask, label):
                        2: [0, 200, 172],
                        3: [0, 106, 200],
                        4: [0, 173, 2]}
-    colored_maps = np.array(Image.fromarray(mask).convert("RGB"))
-    colored_maps[np.where(mask == label)] = coloring_scheme[label]
-    return Image.fromarray(colored_maps)
+    colored_map = np.array(Image.fromarray(mask).convert("RGB"))
+    colored_map[np.where(mask == label)] = coloring_scheme[label]
+    return Image.fromarray(colored_map)
 
 
 def visualize(img_path, bbox, mask, label):
     image = cv2.imread(img_path, cv2.IMREAD_COLOR)
-    colored_maps = convert_mask_to_image(mask, label)
+    colored_map = convert_mask_to_image(mask, label)
     colored_image = add_colored_to_image(image, colored_map)
 
     path_save = 'output/'
