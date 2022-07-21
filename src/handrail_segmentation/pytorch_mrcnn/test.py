@@ -8,6 +8,8 @@ import argparse
 
 from PIL import Image
 
+convert_tensor = transforms.ToTensor()
+
 def get_trained_model(weights_path, num_classes = 5):
     # load an instance segmentation model pre-trained on COCO
     model = torchvision.models.detection.maskrcnn_resnet50_fpn()
@@ -41,7 +43,8 @@ def evaluate():
 
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
 
-    img = transforms.ToTensor(Image.open(args.img_path)).to(device)
+    img = Image.open(args.img_path)
+    img = convert_tensor(img).to(device)
     torch.cuda.synchronize()
     print(model(img))
 
