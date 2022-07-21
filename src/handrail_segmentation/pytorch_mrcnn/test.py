@@ -50,7 +50,7 @@ def evaluate():
 
     output = model(img)
     bbox = output[0]['boxes']
-    mask = output[0]['masks']
+    mask = output[0]['masks'].detach().numpy()
     print(mask.shape)
     print(np.unique(mask))
 
