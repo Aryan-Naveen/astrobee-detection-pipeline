@@ -28,7 +28,6 @@ def visualize(img_path, bbox, mask, label):
     image = cv2.imread(img_path, cv2.IMREAD_COLOR)
     colored_map = convert_mask_to_image(mask, label)
     colored_image = add_colored_to_image(image, colored_map)
-    print(bbox)
     annotated_img = cv2.rectangle(colored_image, (int(np.floor(bbox[0])), int(np.floor(bbox[1]))), (int(np.ceil(bbox[2])), int(np.ceil(bbox[3]))), coloring_scheme[label], 1)
 
     path_save = 'data_eval/output/'

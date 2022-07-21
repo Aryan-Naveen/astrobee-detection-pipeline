@@ -11,7 +11,7 @@ import numpy as np
 
 from utils.visualize import visualize
 from tqdm import tqdm
-
+import os
 
 convert_tensor = transforms.ToTensor()
 
@@ -36,10 +36,22 @@ def get_trained_model(weights_path, num_classes = 5):
 
     return model
 
+def filter_preds(bboxs, masks, labels, scores, thresh=0.7):
+    f_bboxs = []
+    f_masks = []
+    f_labels = []
+    for bbox, mask, label, score in zip(bboxs, masks, labels, scores):
+        if score > thresh:
+            f_bboxs.append(bbox.reshape(4,))
+            f_masks.append(mask.shape(240, 320))
+            f_labels.append(label)
+
+    return f_bboxs, f_masks, f_labels
+
 
 def evaluate():
     parser = argparse.ArgumentParser(description="Evaluate validation data.")
-    parser.add_argument("-i", "--img_directory", type=str, default="eval_data/", help="Path to image to evaluate on")
+    parser.add_argument("-i", "--img_directory", type=str, default="data_eval/images/", help="Path to image to evaluate on")
     parser.add_argument("-w", "--weights", type=str, default="checkpoints/yolov3_ckpt_140.pth")
     parser.add_argument("-n", "--nms_thesh", type=float, default=0.7)
     args = parser.parse_args()
@@ -49,17 +61,24 @@ def evaluate():
 
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
 
-    img_paths = list(sorted(os.listdir(os.path.join(args.img_directory, "images"))))
+#    img_paths = [os.path.join(args.img_directory, img_name) for img_name in list(sorted(os.listdir(args.img_directory)))]
+    img_paths = ['data_eval/images/image_0000002.png']
 
     for img_path in tqdm(img_paths):
+        print(img_path)
         img = Image.open(img_path).convert("RGB")
         img = [convert_tensor(img)]
         torch.cuda.synchronize()
 
         output = model(img)[0]
-        bbox = output['boxes'].detach().numpy().reshape(4,)
-        mask = output['masks'].detach().numpy().reshape(240, 320)
-        label = output['labels'].detach().numpy()[0]
+	num_detections = len(output['labels'])
+
+        bboxs = output['boxes'].detach().numpy()
+        masks = output['masks'].detach().numpy()
+        labels = output['labels'].detach().numpy()
+        scores = output['scores'].detach().numpy()
+
+        bboxs, masks, labels = filter_preds(bboxs, masks, labels, scores)
         np.place(mask, mask > args.nms_thesh, output['labels'][0])
         np.place(mask, mask <= args.nms_thesh, 0)
 
