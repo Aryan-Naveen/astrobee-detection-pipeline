@@ -247,7 +247,7 @@
             <far>20</far>
           </clip>
           <save enabled="true">
-            <path>/home/anaveen/Documents/nasa_ws/astrobee-detection-pipeline/src/handrail_segmentation/pytorch_mrcnn/data</path>
+            <path>/home/anaveen/Documents/nasa_ws/astrobee-detection-pipeline/src/handrail_segmentation/pytorch_mrcnn/data_eval</path>
           </save>
         </camera>
         <always_on>1</always_on>
