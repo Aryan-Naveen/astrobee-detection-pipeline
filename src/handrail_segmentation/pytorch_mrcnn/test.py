@@ -9,6 +9,9 @@ import argparse
 from PIL import Image
 import numpy as np
 
+from utils.visualize import visualize
+
+
 convert_tensor = transforms.ToTensor()
 
 def get_trained_model(weights_path, num_classes = 5):
@@ -52,10 +55,11 @@ def evaluate():
     output = model(img)[0]
     bbox = output['boxes']
     mask = output['masks'].detach().numpy().reshape(240, 320)
+    label = output['labels'].detach().numpy()[0]
     np.place(mask, mask > args.nms_thesh, output['labels'][0])
     np.place(mask, mask <= args.nms_thesh, 0)
-    print(output)
-    print(np.unique(mask))
+
+    visualize(args.img_path, bbox, mask, label)
 
 
 if __name__=='__main__':
