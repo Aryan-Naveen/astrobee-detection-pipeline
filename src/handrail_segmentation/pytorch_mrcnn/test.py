@@ -71,7 +71,7 @@ def evaluate():
         torch.cuda.synchronize()
 
         output = model(img)[0]
-	    num_detections = len(output['labels'])
+        num_detections = len(output['labels'])
 
         bboxs = output['boxes'].detach().numpy()
         masks = output['masks'].detach().numpy()
