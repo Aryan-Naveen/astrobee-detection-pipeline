@@ -31,7 +31,7 @@ def visualize(img_path, bbox, mask, label):
     print(bbox)
     annotated_img = cv2.rectangle(colored_image, (int(np.floor(bbox[0])), int(np.floor(bbox[1]))), (int(np.ceil(bbox[2])), int(np.ceil(bbox[3]))), coloring_scheme[label], 1)
 
-    path_save = 'output/'
+    path_save = 'data_eval/output/'
     imageId = 'segmentation_' + os.path.splitext(img_path)[0][-7:] + '.png'
     if not cv2.imwrite(path_save + imageId, annotated_img):
         raise Exception("Could not write image")
