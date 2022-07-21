@@ -1,7 +1,7 @@
 import torch
 import torchvision
 from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
-from torchvision.models.detection.mask_rcnn import MaskRCNNPredictor, MaskRCNN_ResNet50_FPN_Weights
+from torchvision.models.detection.mask_rcnn import MaskRCNNPredictor
 
 
 import utils.utils as utils
@@ -24,7 +24,7 @@ def get_transform(train):
 
 def get_model_instance_segmentation(num_classes):
     # load an instance segmentation model pre-trained on COCO
-    model = torchvision.models.detection.maskrcnn_resnet50_fpn(weights=MaskRCNN_ResNet50_FPN_Weights.DEFAULT)
+    model = torchvision.models.detection.maskrcnn_resnet50_fpn(pretrained=True)
 
     # get number of input features for the classifier
     in_features = model.roi_heads.box_predictor.cls_score.in_features
@@ -55,7 +55,7 @@ def main():
 
     # split the dataset in train and test set
     indices = torch.randperm(len(dataset)).tolist()
-    cutoff = int(len(dataset)*0.7)
+    cutoff = int(len(dataset)*0.8)
     dataset = torch.utils.data.Subset(dataset, indices[:cutoff])
     dataset_test = torch.utils.data.Subset(dataset_test, indices[cutoff:])
 
@@ -65,7 +65,7 @@ def main():
         collate_fn=utils.collate_fn)
 
     data_loader_test = torch.utils.data.DataLoader(
-        dataset_test, batch_size=1, shuffle=False, num_workers=params.hyperparams["num_workers"],
+        dataset_test, batch_size=2, shuffle=False, num_workers=params.hyperparams["num_workers"],
         collate_fn=utils.collate_fn)
 
     # get the model using our helper function
@@ -84,7 +84,7 @@ def main():
                                                    gamma=params.optimizer["gamma"])
 
     # let's train it for 10 epochs
-    num_epochs = 10
+    num_epochs = 150
 
     for epoch in range(num_epochs):
         # # train for one epoch, printing every 10 iterations
@@ -133,12 +133,13 @@ def main():
             # Log progress
             # ############
 
-        evaluate(model, data_loader_test, device=device)
 
         if epoch % params.checkpoint_interval == 0:
             checkpoint_path = f"checkpoints/yolov3_ckpt_{epoch}.pth"
             print(f"---- Saving checkpoint to: '{checkpoint_path}' ----")
             torch.save(model.state_dict(), checkpoint_path)
+            evaluate(model, data_loader_test, device=device)
+
 
     print("That's it!")
 

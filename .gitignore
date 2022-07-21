@@ -135,3 +135,6 @@ src/object_pose_estimation/src/models/weights/
 #Generated Data
 src/handrail_segmentation/worlds/data/
 src/handrail_segmentation/pytorch_mrcnn/data/
+
+# Saved weights
+src/handrail_segmentation/pytorch_mrcnn/checkpoints/
