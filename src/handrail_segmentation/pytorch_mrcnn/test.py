@@ -43,7 +43,7 @@ def evaluate():
 
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
 
-    img = Image.open(args.img_path)
+    img = Image.open(args.img_path).convert("RGB")
     img = convert_tensor(img).to(device)
     torch.cuda.synchronize()
     print(model(img))
