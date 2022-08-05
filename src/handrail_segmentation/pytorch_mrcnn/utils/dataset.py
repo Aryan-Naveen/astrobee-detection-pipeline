@@ -2,7 +2,11 @@ import os
 import numpy as np
 import torch
 from PIL import Image, ImageOps
+import cv2
+import random
 
+from .visualize import convert_mask_to_image
+from torchvision.transforms import functional as F
 
 class AstrobeeHandrailDataset(torch.utils.data.Dataset):
     def __init__(self, root, transforms):
@@ -30,7 +34,6 @@ class AstrobeeHandrailDataset(torch.utils.data.Dataset):
         obj_ids = np.unique(mask)
         # first id is the background, so remove it
         obj_ids = obj_ids[1:]
-        print(obj_ids)
 
         # split the color-encoded mask into a set
         # of binary masks
@@ -70,7 +73,13 @@ class AstrobeeHandrailDataset(torch.utils.data.Dataset):
         target["iscrowd"] = iscrowd
 
         if self.transforms is not None:
+            i = random.randint(0, 150)
             img, target = self.transforms(img, target)
+            # vis_img = F.to_pil_image(img)
+            # # cv2.imwrite('/home/anaveen/image.png', img[0].numpy())
+            # vis_img.save('/home/anaveen/augmentation/image' +str(i)+ '.png')
+            # label = np.unique(target['masks'][0].numpy())[-1]
+            # cv2.imwrite('/home/anaveen/augmentation/target' + str(i) + '.png', convert_mask_to_image(target['masks'][0].numpy(), label))
 
         return img, target
 

@@ -17,9 +17,9 @@ import tqdm
 
 def get_transform(train):
     transforms = []
-    transforms.append(T.ToTensor())
     if train:
         transforms.append(T.RandAugment())
+    transforms.append(T.ToTensor())
     return T.Compose(transforms)
 
 def get_model_instance_segmentation(num_classes):
