@@ -19,7 +19,7 @@ def get_transform(train):
     transforms = []
     transforms.append(T.ToTensor())
     if train:
-        transforms.append(T.RandomHorizontalFlip(0.5))
+        transforms.append(T.RandAugment())
     return T.Compose(transforms)
 
 def get_model_instance_segmentation(num_classes):
