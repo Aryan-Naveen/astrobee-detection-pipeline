@@ -2,6 +2,10 @@ import random
 import torch
 
 from torchvision.transforms import functional as F, InterpolationMode
+import math
+from enum import Enum
+from typing import Dict, List, Optional, Tuple
+from torch import Tensor
 
 
 def _flip_coco_person_keypoints(kps, width):
