@@ -138,3 +138,4 @@ src/handrail_segmentation/pytorch_mrcnn/data/
 
 # Saved weights
 src/handrail_segmentation/pytorch_mrcnn/checkpoints/
+src/handrail_segmentation/src/weights/

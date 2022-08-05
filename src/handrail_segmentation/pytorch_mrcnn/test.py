@@ -16,6 +16,16 @@ import cv2
 
 convert_tensor = transforms.ToTensor()
 
+def post_process(detections, num_detections, c_thresh = 0.75):
+    p_detections = []
+    for i in range(num_detections):
+        if detections['scores'][i] > c_thresh:
+            detection = {"bbox": detections['boxes'].detach().numpy()[i].reshape(4,),
+                         "mask": detections['masks'].detach().numpy()[i].reshape(240, 320),
+                         "label": detections['labels'].detach().numpy()[i]}
+            p_detections.append(detection)
+    return p_detections
+
 def get_trained_model(weights_path, num_classes = 5):
     # load an instance segmentation model pre-trained on COCO
     model = torchvision.models.detection.maskrcnn_resnet50_fpn()
@@ -37,23 +47,11 @@ def get_trained_model(weights_path, num_classes = 5):
 
     return model
 
-def filter_preds(bboxs, masks, labels, scores, thresh=0.7):
-    f_bboxs = []
-    f_masks = []
-    f_labels = []
-    for bbox, mask, label, score in zip(bboxs, masks, labels, scores):
-        if score > thresh:
-            f_bboxs.append(bbox.reshape(4,))
-            f_masks.append(mask.reshape(240, 320))
-            f_labels.append(label)
-
-    return f_bboxs, f_masks, f_labels
-
 
 def evaluate():
     parser = argparse.ArgumentParser(description="Evaluate validation data.")
-    parser.add_argument("-i", "--img_directory", type=str, default="data_eval/images/", help="Path to image to evaluate on")
-    parser.add_argument("-w", "--weights", type=str, default="checkpoints/yolov3_ckpt_140.pth")
+    parser.add_argument("-i", "--img_directory", type=str, default="data_test/images/", help="Path to image to evaluate on")
+    parser.add_argument("-w", "--weights", type=str, default="/home/anaveen/Documents/nasa_ws/astrobee-detection-pipeline/src/handrail_segmentation/src/weights/yolov3_ckpt_140.pth")
     parser.add_argument("-n", "--nms_thesh", type=float, default=0.7)
     args = parser.parse_args()
 
@@ -69,20 +67,16 @@ def evaluate():
         img = [convert_tensor(img)]
         torch.cuda.synchronize()
 
-        output = model(img)[0]
-        num_detections = len(output['labels'])
-
-        bboxs = output['boxes'].detach().numpy()
-        masks = output['masks'].detach().numpy()
-        labels = output['labels'].detach().numpy()
-        scores = output['scores'].detach().numpy()
-
-        bboxs, masks, labels = filter_preds(bboxs, masks, labels, scores)
+        detections = model(img)[0]
+        n = len(detections['labels'])
+        detections = post_process(detections, n)
 
         annotated_img = cv2.imread(img_path, cv2.IMREAD_COLOR)
 
-        for bbox, mask, label in zip(bboxs, masks, labels):
-            np.place(mask, mask > args.nms_thesh, output['labels'][0])
+        for detection in detections:
+            bbox, mask, label = detection.values()
+
+            np.place(mask, mask > args.nms_thesh, label)
             np.place(mask, mask <= args.nms_thesh, 0)
 
             annotated_img = visualize(annotated_img, bbox, mask, label)
