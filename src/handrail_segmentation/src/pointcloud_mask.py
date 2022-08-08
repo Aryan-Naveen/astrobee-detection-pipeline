@@ -22,7 +22,7 @@ import os, cv2
 from cv_bridge import CvBridge
 from utils.undistorter import Undistorter
 from utils.converter import *
-
+from sklearn.cluster import DBSCAN
 import matplotlib.pyplot as plt
 
 # Get package path in file directory
@@ -82,7 +82,9 @@ class PerchCamProcess():
 
 
     def img_callback(self, msg):
-        self.img = self.undist.undistort(np.asarray(self.bridge.imgmsg_to_cv2(msg, 'bgr8')))
+        img  = np.asarray(self.bridge.imgmsg_to_cv2(msg, 'bgr8'))
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        self.img = self.undist.undistort(cv2.resize(img, (320, 240), interpolation = cv2.INTER_AREA))
         self.compute_stuff()
 
     def pointcloud_callback(self, msg):
@@ -94,6 +96,7 @@ class PerchCamProcess():
 
     def compute_stuff(self):
         if self.mask is not None and self.pc is not None and self.img is not None:
+            rospy.loginfo('Processing mask and Pointcloud')
             self.mask_ = cv2.cvtColor(np.asarray(self.bridge.imgmsg_to_cv2(self.mask, 'rgb8')), cv2.COLOR_BGR2GRAY)
 
             # transform to dock cam coordinate basis
@@ -112,7 +115,7 @@ class PerchCamProcess():
             pixel_point_map = -1*np.ones(self.mask_.shape)
             for i in range(n_points):
                 pt = points_np[i].reshape(3, )
-                px = int(np.round(f*pt[0]/pt[2] + cx))
+                px = int(np.floor(f*pt[0]/pt[2] + cx))
                 py = int(np.round(f*pt[1]/pt[2] + cy))
 
                 if py >= self.mask_.shape[0] or px >= self.mask_.shape[1]:
@@ -120,9 +123,6 @@ class PerchCamProcess():
 
                 if py < 0 or px < 0:
                     continue
-
-                if not self.mask_[py][px] == 0:
-                    points_handrail.append([pt[0], pt[1], pt[2]])
 
                 px_rgb = self.img[py][px]
                 rgb = struct.unpack('I', struct.pack('BBBB', px_rgb[2], px_rgb[1], px_rgb[0], 255))[0]
@@ -133,13 +133,14 @@ class PerchCamProcess():
                     min_pixel_z[py][px] = pt[2]
                     pixel_point_map[py][px] = i
 
+
             handrail_pixels = np.where(self.mask_ > 0)
             points_handrail_indices = np.unique(pixel_point_map[handrail_pixels]).astype(int)
             if points_handrail_indices[0] == -1:
                 points_handrail_indices = points_handrail_indices[1:]
 
             points_handrail = points_np[points_handrail_indices]
-            handrail_pc2 = convertPc2(points_handrail)
+            handrail_pc2 = convertPc2(points_handrail[np.where(DBSCAN(eps=0.02, min_samples=1).fit(points_handrail).labels_ == 0)])
             self.pub_handrail.publish(handrail_pc2)
 
             rgb_pc2 = convertPc2(rgb_pointcloud, rgb_include=True)

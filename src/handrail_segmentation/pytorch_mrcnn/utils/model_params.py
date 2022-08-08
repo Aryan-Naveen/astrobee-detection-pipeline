@@ -6,7 +6,7 @@ class Model_Params():
                             "weight_decay": 0.0005,
                             "burn_in": 1000,
                             "lr_steps": 4,
-                            "batch_size": 4,
+                            "batch_size": 2,
                             "num_workers": 4}
         self.optimizer = {"step_size": 3,
                                 "gamma": 0.1}

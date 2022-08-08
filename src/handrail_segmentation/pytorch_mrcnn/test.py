@@ -17,6 +17,7 @@ import cv2
 convert_tensor = transforms.ToTensor()
 
 def post_process(detections, num_detections, c_thresh = 0.75):
+    print(detections)
     p_detections = []
     for i in range(num_detections):
         if detections['scores'][i] > c_thresh:
@@ -51,7 +52,7 @@ def get_trained_model(weights_path, num_classes = 5):
 def evaluate():
     parser = argparse.ArgumentParser(description="Evaluate validation data.")
     parser.add_argument("-i", "--img_directory", type=str, default="data_test/images/", help="Path to image to evaluate on")
-    parser.add_argument("-w", "--weights", type=str, default="/home/anaveen/Documents/nasa_ws/astrobee-detection-pipeline/src/handrail_segmentation/src/weights/yolov3_ckpt_140.pth")
+    parser.add_argument("-w", "--weights", type=str, default="/home/anaveen/Documents/nasa_ws/astrobee-detection-pipeline/src/handrail_segmentation/pytorch_mrcnn/checkpoints/mrcnn_ckpt_0.pth")
     parser.add_argument("-n", "--nms_thesh", type=float, default=0.7)
     args = parser.parse_args()
 

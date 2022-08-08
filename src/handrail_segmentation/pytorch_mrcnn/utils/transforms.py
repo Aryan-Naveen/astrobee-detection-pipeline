@@ -207,7 +207,6 @@ class RandAugment(torch.nn.Module):
             if signed and torch.randint(2, (1,)):
                 magnitude *= -1.0
             img = _apply_op(img, op_name, magnitude, interpolation=self.interpolation, fill=fill)
-            print(op_name)
             if op_name in ['Identity', 'ShearX', 'ShearY', 'TranslateX', 'TranslateY', 'Rotate']:
                 label = _apply_op(label, op_name, magnitude, interpolation=self.interpolation, fill=fill)
 

@@ -24,7 +24,7 @@ def get_transform(train):
 
 def get_model_instance_segmentation(num_classes):
     # load an instance segmentation model pre-trained on COCO
-    model = torchvision.models.detection.maskrcnn_resnet50_fpn(pretrained=True)
+    model = torchvision.models.detection.maskrcnn_resnet50_fpn()
 
     # get number of input features for the classifier
     in_features = model.roi_heads.box_predictor.cls_score.in_features
@@ -38,7 +38,7 @@ def get_model_instance_segmentation(num_classes):
     model.roi_heads.mask_predictor = MaskRCNNPredictor(in_features_mask,
                                                        hidden_layer,
                                                        num_classes)
-
+    model.load_state_dict(torch.load('/home/anaveen/Documents/nasa_ws/astrobee-detection-pipeline/src/handrail_segmentation/src/weights/mrcnn_ckpt_60.pth'))
     return model
 
 def main():
@@ -50,8 +50,8 @@ def main():
     # our dataset has five classes only - background and handrail 8.5, handrail 21.5, handrail 30, handrail 41.5
     num_classes = 5
     # use our dataset and defined transformations
-    dataset = AstrobeeHandrailDataset('data', get_transform(train=True))
-    dataset_test = AstrobeeHandrailDataset('data', get_transform(train=False))
+    dataset = AstrobeeHandrailDataset('data_granite_lab', get_transform(train=True))
+    dataset_test = AstrobeeHandrailDataset('data_granite_lab', get_transform(train=False))
 
     # split the dataset in train and test set
     indices = torch.randperm(len(dataset)).tolist()
@@ -84,7 +84,7 @@ def main():
                                                    gamma=params.optimizer["gamma"])
 
     # let's train it for 10 epochs
-    num_epochs = 150
+    num_epochs = 200
 
     for epoch in range(num_epochs):
         # # train for one epoch, printing every 10 iterations

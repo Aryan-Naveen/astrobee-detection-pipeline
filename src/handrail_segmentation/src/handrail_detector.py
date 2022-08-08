@@ -88,7 +88,7 @@ class HandrailDetectorManager():
     def __init__(self):
         self.simulation = True
         # Load weights parameter
-        weights_name = rospy.get_param('~weights_name', 'yolov3_ckpt_140.pth')
+        weights_name = rospy.get_param('~weights_name', 'mrcnn_ckpt_60.pth')
         self.weights_path = os.path.join(package_path, 'src/weights', weights_name)
         rospy.loginfo("Found weights, loading %s", self.weights_path)
 
@@ -98,7 +98,7 @@ class HandrailDetectorManager():
 
         # Load image parameter and confidence threshold
         self.image_topic = rospy.get_param('~image_topic', 'hw/cam_dock/image_raw')
-        self.nms_th = rospy.get_param('~nms_th', 0.75)
+        self.nms_th = rospy.get_param('~nms_th', 0.9)
 
         # Load publisher topics
         self.segmentation_mask = rospy.get_param('~detected_objects_topic', "det/mask")
@@ -125,12 +125,13 @@ class HandrailDetectorManager():
         self.image_sub = rospy.Subscriber(self.image_topic, ROSImage, self.imageCb, queue_size = 1, buff_size = 2**24)
 
         # Define publishers
-        self.pub_ = rospy.Publisher(self.segmentation_mask, ROSImage, queue_size=10)
+        self.pub_ = rospy.Publisher(self.segmentation_mask, ROSImage, queue_size=1)
         self.pub_viz_ = rospy.Publisher(self.published_annotated_img_topic, ROSImage, queue_size=10)
         self.bridge = CvBridge()
         rospy.loginfo("Launched node for handrail segmentation")
 
     def preprocessImage(self, imgIn):
+        imgIn = cv2.cvtColor(imgIn, cv2.COLOR_BGR2RGB)
         imgIn = cv2.resize(imgIn, (320, 240), interpolation = cv2.INTER_AREA)
         imgIn = self.undist_.undistort(imgIn)
         return [convert_tensor(imgIn)], imgIn
@@ -165,18 +166,17 @@ class HandrailDetectorManager():
         # Convert the image to OpenCV
         imgDist = np.asarray(self.bridge.imgmsg_to_cv2(data, 'bgr8'))
         imgIn, annotated_img = self.preprocessImage(imgDist)
+        cv2.imwrite('/home/anaveen/test.png', annotated_img)
 
         dims = (annotated_img.shape[0], annotated_img.shape[1])
-
+        torch.cuda.synchronize()
         detections = self.model(imgIn)[0]
         n = len(detections['labels'])
-        print(n)
-        cv2.imwrite('/home/anaveen/test.png', annotated_img)
         detections = post_process(detections, n)
 
-        # annotated_img = imgIn[0].detach().numpy().copy()
         mask_ = np.zeros(dims).astype(np.uint8)
         for detection in detections:
+
             bbox, mask, label = detection.values()
 
             np.place(mask, mask > self.nms_th, label)

@@ -13,27 +13,39 @@ import numpy as np
 from utils.transformation import TransformAlignment
 import utils.icp as icp
 from utils.converter import *
+import copy
+
+def draw_registration_result(source, target, transformation):
+    source_temp = copy.deepcopy(source)
+    target_temp = copy.deepcopy(target)
+    source_temp.voxel_down_sample(voxel_size=0.1)
+    source_temp.paint_uniform_color([1, 0.706, 0])
+    target_temp.paint_uniform_color([0, 0.651, 0.929])
+    source_temp.transform(transformation)
+    # o3d.visualization.draw_geometries([source_temp, target_temp], point_show_normal=True)
 
 
-
-
-def preprocess_point_cloud(pcd, voxel_size, should_voxel=True):
+def preprocess_point_cloud(pcd, voxel_size, radius, should_voxel=True):
     if should_voxel:
         pcd_down = pcd.voxel_down_sample(voxel_size)
     else:
         pcd_down = pcd
-    radius_normal = voxel_size * 2
+    radius_normal = radius * 2
     pcd_down.estimate_normals(o3d.geometry.KDTreeSearchParamHybrid(radius=radius_normal, max_nn=30))
-    radius_feature = voxel_size * 5
+    radius_feature = radius * 5
     pcd_fpfh = o3d.pipelines.registration.compute_fpfh_feature(
         pcd_down,
         o3d.geometry.KDTreeSearchParamHybrid(radius=radius_feature, max_nn=100))
     return pcd_down, pcd_fpfh
 
+
+
+
+
 def execute_global_registration(src, target, voxel_size=0.01):
 
-    source_down, source_fpfh = preprocess_point_cloud(src, voxel_size)
-    target_down, target_fpfh = preprocess_point_cloud(target, voxel_size)
+    source_down, source_fpfh = preprocess_point_cloud(src, voxel_size, voxel_size)
+    target_down, target_fpfh = preprocess_point_cloud(target, voxel_size, 75*voxel_size)
 
     distance_threshold = voxel_size * 1.5
     result = o3d.pipelines.registration.registration_ransac_based_on_feature_matching(
@@ -46,6 +58,8 @@ def execute_global_registration(src, target, voxel_size=0.01):
                 o3d.pipelines.registration.CorrespondenceCheckerBasedOnDistance(
                     distance_threshold)
             ], o3d.pipelines.registration.RANSACConvergenceCriteria(100000, 0.999))
+
+    draw_registration_result(source_down, target_down, result.transformation)
     return result
 
 
@@ -63,15 +77,10 @@ class DOFPoseEstimator():
         detected_handrail_o3d = o3d.geometry.PointCloud()
         detected_handrail_o3d.points = o3d.utility.Vector3dVector(detected_handrail)
 
-        centroid = np.average(detected_handrail, axis=0)
+
 
         registered_handrail_o3d = o3d.io.read_point_cloud('/home/anaveen/Documents/nasa_ws/astrobee-detection-pipeline/src/handrail_segmentation/src/reference_pointclouds/handrail_30.pcd')
         registered_handrail = np.asarray(registered_handrail_o3d.points)
-        centroid_translation = np.average(detected_handrail, axis=0) - np.average(registered_handrail, axis=0)
-
-        trans_init = np.identity(4)
-        trans_init[:3, 3] = centroid_translation[:3]
-        threshold = 0.02
 
         rospy.loginfo("Running ICP to estimate 6 DOF pose of detected object")
         reg_p2p = execute_global_registration(registered_handrail_o3d, detected_handrail_o3d)
@@ -79,11 +88,12 @@ class DOFPoseEstimator():
 
         T = np.asarray(reg_p2p.transformation)
 
-        visualize = []
-        for point in registered_handrail:
-            visualize.append(np.dot(T, np.append(point.reshape(3, ), 1))[:3])
-
-        self.pub_.publish(convertPc2(visualize))
+        # visualize = []
+        # for point in registered_handrail:
+        #     visualize.append(np.dot(T, np.append(point.reshape(3, ), 1))[:3])
+        #
+        # self.pub_.publish(convertPc2(visualize))
+        rospy.loginfo(T)
         rospy.loginfo("------------------Transformation computed----------------")
 
 
