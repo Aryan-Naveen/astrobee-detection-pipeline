@@ -1,0 +1,48 @@
+Measured Ground truth position of center of handrail(meters): 
+	x: 0.96
+	y: 0.03
+	z:-0.9
+(Relative pose estimates)
+
+pose1.bag (straight on):
+  position: 
+    x: -0.022866737097501755
+    y: -0.03128060698509216
+    z: 0.6230453848838806
+  orientation: 
+    x: 0.0031346590258181095
+    y: 0.7041980624198914
+    z: 0.007357574533671141
+    w: 0.7099586129188538
+
+pose2.bag:
+  position: 
+    x: -0.029189851135015488
+    y: -0.06468861550092697
+    z: 0.70302414894104
+  orientation: 
+    x: -0.22693078219890594
+    y: 0.6773167252540588
+    z: -0.20467376708984375
+    w: 0.6692184209823608
+
+pose3.bag:
+  position: 
+    x: -0.03453501686453819
+    y: -0.006034646183252335
+    z: 0.7671530842781067
+  orientation: 
+    x: 0.2460242360830307
+    y: 0.666484534740448
+    z: 0.23295950889587402
+    w: 0.6640786528587341
+
+hard1.bag:
+	[ WARN] [1660067599.551981494, 1455211364.958769893]: [Handrail] No handrail found
+
+hard2.bag:
+	[ WARN] [1660067697.290278667, 1455211364.958769893]: [Handrail] No handrail found
+
+hard3.bag
+	[ WARN] [1660067826.314499562]: [Handrail] No handrail found
+
