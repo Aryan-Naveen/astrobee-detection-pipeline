@@ -109,7 +109,7 @@ import std_msgs.msg as std_msgs
 
 
 
-def convertPc2(points, rgb_include = False):
+def convertPc2(points, rgb_include = False, frame_id="dock_cam"):
     if rgb_include:
         fields = [PointField('x', 0, PointField.FLOAT32, 1),
                   PointField('y', 4, PointField.FLOAT32, 1),
@@ -122,7 +122,7 @@ def convertPc2(points, rgb_include = False):
 
 
     header = Header()
-    header.frame_id = "dock_cam"
+    header.frame_id = frame_id
     header.stamp = rospy.Time.now()
 
 

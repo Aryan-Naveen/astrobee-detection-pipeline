@@ -91,9 +91,9 @@ endif()
 # flag project as catkin-based to distinguish if a find_package()-ed project is a catkin project
 set(handrail_segmentation_FOUND_CATKIN_PROJECT TRUE)
 
-if(NOT " " STREQUAL " ")
+if(NOT "/home/anaveen/Documents/nasa_ws/astrobee-detection-pipeline/devel/include " STREQUAL " ")
   set(handrail_segmentation_INCLUDE_DIRS "")
-  set(_include_dirs "")
+  set(_include_dirs "/home/anaveen/Documents/nasa_ws/astrobee-detection-pipeline/devel/include")
   if(NOT " " STREQUAL " ")
     set(_report "Check the issue tracker '' and consider creating a ticket if the problem has not been reported yet.")
   elseif(NOT " " STREQUAL " ")
@@ -177,7 +177,7 @@ foreach(library ${libraries})
   endif()
 endforeach()
 
-set(handrail_segmentation_EXPORTED_TARGETS "")
+set(handrail_segmentation_EXPORTED_TARGETS "handrail_segmentation_generate_messages_cpp;handrail_segmentation_generate_messages_eus;handrail_segmentation_generate_messages_lisp;handrail_segmentation_generate_messages_nodejs;handrail_segmentation_generate_messages_py")
 # create dummy targets for exported code generation targets to make life of users easier
 foreach(t ${handrail_segmentation_EXPORTED_TARGETS})
   if(NOT TARGET ${t})
@@ -185,7 +185,7 @@ foreach(t ${handrail_segmentation_EXPORTED_TARGETS})
   endif()
 endforeach()
 
-set(depends "")
+set(depends "message_runtime")
 foreach(depend ${depends})
   string(REPLACE " " ";" depend_list ${depend})
   # the package name of the dependency must be kept in a unique variable so that it is not overwritten in recursive calls
@@ -214,7 +214,7 @@ foreach(depend ${depends})
   _list_append_deduplicate(handrail_segmentation_EXPORTED_TARGETS ${${handrail_segmentation_dep}_EXPORTED_TARGETS})
 endforeach()
 
-set(pkg_cfg_extras "")
+set(pkg_cfg_extras "handrail_segmentation-msg-extras.cmake")
 foreach(extra ${pkg_cfg_extras})
   if(NOT IS_ABSOLUTE ${extra})
     set(extra ${handrail_segmentation_DIR}/${extra})

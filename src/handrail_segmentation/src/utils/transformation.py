@@ -5,6 +5,10 @@ import tf2_py as tf2
 from tf2_sensor_msgs.tf2_sensor_msgs import do_transform_cloud
 import rospy
 import pcl, ros_numpy, open3d
+import tf2_geometry_msgs
+
+
+
 
 class TransformAlignment():
     def __init__(self):
@@ -25,22 +29,51 @@ class TransformAlignment():
 
         return do_transform_cloud(orig_pointcloud, trans)
 
-    def get_pixel_ids_of_pointcloud(self, pt):
-        rospy.loginfo("SIKE")
+    def dock_to_world_transform(self, orig_pointcloud):
+        try:
+            trans = self.tf_buffer.lookup_transform("world", orig_pointcloud.header.frame_id,
+                                                   orig_pointcloud.header.stamp,
+                                                   rospy.Duration(100))
+        except tf2.LookupException as ex:
+            rospy.logwarn(ex)
+            return
+        except tf2.ExtrapolationException as ex:
+            rospy.logwarn(ex)
+            return
 
-    def RemapDomainToDomain(self, val,minO,maxO,minN,maxN):
-        """Remaps a number in an arbitrary domain to another arbitrary domain"""
-        if val>maxO or val<minO: return
-        if maxO==minO or maxN==minN: return
-        return ((val-minO)/(maxO-minO)*(maxN-minN))+minN
+        return do_transform_cloud(orig_pointcloud, trans)
 
-    def Remap2DPointDomain(self, pt,domA,domAA,domB,domBB):
-        """Remaps a 2D point from one 2D domain to another (Z unchanged)
-        A-->AA; B-->BB. Needs RemapDomainToDomain function"""
-        newPtX= self.RemapDomainToDomain(pt[0],domA[0],domA[1],domAA[0],domAA[1])
-        newPtY= self.RemapDomainToDomain(pt[1],domB[0],domB[1],domBB[0],domBB[1])
-        if newPtX != None and newPtY != None:
-            return [newPtX, newPtY]
+    def transform_pose_estimate(self, pose):
+        pose_stamped = tf2_geometry_msgs.PoseStamped()
+        pose_stamped.pose = pose
+        pose_stamped.header.frame_id = "dock_cam"
+        pose_stamped.header.stamp = rospy.Time.now()
+        try:
+            # ** It is important to wait for the listener to start listening. Hence the rospy.Duration(1)
+            output_pose_stamped = self.tf_buffer.transform(pose_stamped, "world", rospy.Duration(1))
+            return output_pose_stamped.pose
+
+        except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException):
+            raise
+
+    def msg_to_se3(self, p, q):
+        """Conversion from geometric ROS messages into SE(3)
+
+        @param msg: Message to transform. Acceptable types - C{geometry_msgs/Pose}, C{geometry_msgs/PoseStamped},
+        C{geometry_msgs/Transform}, or C{geometry_msgs/TransformStamped}
+        @return: a 4x4 SE(3) matrix as a numpy array
+        @note: Throws TypeError if we receive an incorrect type.
+        """
+        norm = np.linalg.norm(q)
+        if np.abs(norm - 1.0) > 1e-3:
+            raise ValueError(
+                "Received un-normalized quaternion (q = {0:s} ||q|| = {1:3.6f})".format(
+                    str(q), np.linalg.norm(q)))
+        elif np.abs(norm - 1.0) > 1e-6:
+            q = q / norm
+        g = tr.quaternion_matrix(q)
+        g[0:3, -1] = p
+        return g
 
     def convert_pc_msg_to_np(self, pc_msg):
         # Fix rosbag issues, see: https://github.com/eric-wieser/ros_numpy/issues/23

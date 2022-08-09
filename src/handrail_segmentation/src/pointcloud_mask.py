@@ -59,7 +59,7 @@ class PerchCamProcess():
         self.camera_model = PinholeCameraModel()
         self.undist = Undistorter()
 
-        self.pub_handrail = rospy.Publisher('/hw/detected_handrail', PointCloud2, queue_size=10)
+        self.pub_handrail = rospy.Publisher('/hw/detected_handrail/points', PointCloud2, queue_size=10)
         self.pub_rgb_pointcloud = rospy.Publisher('/hw/depth_perch/points/rgb', PointCloud2, queue_size=10)
         # Define subscribers
         self.mask_sub = rospy.Subscriber(self.mask_topic, ROSImage, self.mask_callback, queue_size = 1, buff_size = 2**24)
