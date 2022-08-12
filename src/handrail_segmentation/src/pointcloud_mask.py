@@ -30,7 +30,7 @@ package = RosPack()
 package_path = package.get_path('handrail_segmentation')
 
 
-import pcl, ros_numpy, open3d
+import pcl, ros_numpy, open3d, timeit
 
 from utils.transformation import TransformAlignment
 from utils.converter import convertCloudFromRosToOpen3d
@@ -97,6 +97,7 @@ class PerchCamProcess():
     def compute_stuff(self):
         if self.mask is not None and self.pc is not None and self.img is not None:
             rospy.loginfo('Processing mask and Pointcloud')
+            start = timeit.default_timer()
             self.mask_ = cv2.cvtColor(np.asarray(self.bridge.imgmsg_to_cv2(self.mask, 'rgb8')), cv2.COLOR_BGR2GRAY)
 
             # transform to dock cam coordinate basis
@@ -142,6 +143,8 @@ class PerchCamProcess():
             points_handrail = points_np[points_handrail_indices]
             handrail_pc2 = convertPc2(points_handrail[np.where(DBSCAN(eps=0.02, min_samples=1).fit(points_handrail).labels_ == 0)])
             self.pub_handrail.publish(handrail_pc2)
+            stop = timeit.default_timer()
+            rospy.loginfo("~~~~~~~~~~~~~RGBD Alignment took " + str(stop - start) + " seconds.~~~~~~~~~~~~~~~~")
 
             rgb_pc2 = convertPc2(rgb_pointcloud, rgb_include=True)
             self.pub_rgb_pointcloud.publish(rgb_pc2)

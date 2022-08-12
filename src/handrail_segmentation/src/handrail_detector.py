@@ -28,6 +28,8 @@ import torchvision
 from torchvision.models.detection.mask_rcnn import MaskRCNNPredictor
 from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
 
+import timeit
+
 from torchvision import transforms
 convert_tensor = transforms.ToTensor()
 
@@ -88,7 +90,7 @@ class HandrailDetectorManager():
     def __init__(self):
         self.simulation = True
         # Load weights parameter
-        weights_name = rospy.get_param('~weights_name', 'mrcnn_ckpt_60.pth')
+        weights_name = rospy.get_param('~weights_name', 'finetuned_ckpt_199.pth')
         self.weights_path = os.path.join(package_path, 'src/weights', weights_name)
         rospy.loginfo("Found weights, loading %s", self.weights_path)
 
@@ -164,9 +166,9 @@ class HandrailDetectorManager():
     def imageCb(self, data):
         rospy.loginfo("Recieved image from dock cam")
         # Convert the image to OpenCV
+        start = timeit.default_timer()
         imgDist = np.asarray(self.bridge.imgmsg_to_cv2(data, 'bgr8'))
         imgIn, annotated_img = self.preprocessImage(imgDist)
-        cv2.imwrite('/home/anaveen/test.png', annotated_img)
 
         dims = (annotated_img.shape[0], annotated_img.shape[1])
         torch.cuda.synchronize()
@@ -188,6 +190,8 @@ class HandrailDetectorManager():
         mask_msg = self.process_mask(mask_)
 
         self.pub_.publish(self.bridge.cv2_to_imgmsg(mask_msg, 'rgb8'))
+        stop = timeit.default_timer()
+        rospy.loginfo("~~~~~~~~~~~~~Handrail Mask RCNN took is " + str(stop - start) + " seconds.~~~~~~~~~~~~~~~~")
         self.pub_viz_.publish(self.bridge.cv2_to_imgmsg(annotated_img, 'rgb8'))
 
         return True

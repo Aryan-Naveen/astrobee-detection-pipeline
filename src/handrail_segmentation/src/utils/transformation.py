@@ -31,7 +31,7 @@ class TransformAlignment():
 
     def dock_to_world_transform(self, orig_pointcloud):
         try:
-            trans = self.tf_buffer.lookup_transform("world", orig_pointcloud.header.frame_id,
+            trans = self.tf_buffer.lookup_transform("dock_cam", orig_pointcloud.header.frame_id,
                                                    orig_pointcloud.header.stamp,
                                                    rospy.Duration(100))
         except tf2.LookupException as ex:

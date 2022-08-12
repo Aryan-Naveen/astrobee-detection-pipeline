@@ -15,17 +15,19 @@ class Undistorter:
             dims = np.asarray((320, 240))
             dist = 1.06251
         else:
-            self.K = np.array([[753.50986,          0.      ,    565.35452],
-                          [        0.      , 751.15119,    483.81274],
+            self.K = np.array([[251.16995333333332,          0.      ,    188.45150666666666],
+                          [        0.      , 251.16995333333332,    161.27091333333334],
                           [        0.      ,          0.      ,     1.  ]])
             dist = 1.00447
 
-            camera_dims = np.asarray((1280, 960))
+            # camera_dims = np.asarray((1280, 960))
 
             dims = np.asarray((320, 240))
 
-            self.K = self.K / (camera_dims/dims)[0]
+            # self.K = self.K / (camera_dims/dims)[0]
 
+
+        # FOV model -
         K_undist = self.K.copy()
         K_undist[0:2,2] = dims/2.
         #get set of x-y coordinates

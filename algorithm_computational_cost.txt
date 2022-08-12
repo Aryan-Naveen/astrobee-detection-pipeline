@@ -1,0 +1,3 @@
+Mask RCNN: 2.79 seconds
+RGBD Alignment: 2.8002 seconds
+Pointcloud Registration: 2.91 seconds

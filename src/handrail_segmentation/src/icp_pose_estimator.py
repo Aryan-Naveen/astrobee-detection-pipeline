@@ -18,7 +18,11 @@ import copy
 from probreg import cpd
 from scipy.spatial.transform import Rotation as R
 
+import timeit
+import tf2_ros
+
 from handrail_segmentation.msg import EkfState
+import geometry_msgs
 
 def draw_registration_result(source, target, transformation):
     source_temp = copy.deepcopy(source)
@@ -59,9 +63,11 @@ class DOFPoseEstimator():
     def __init__(self):
         self.handrail_p = None
         self.handrail_q = None
+        self.br = tf2_ros.TransformBroadcaster()
 
         self.pointcloud_topic = rospy.get_param('~segmented_object_topic', '/hw/detected_handrail/points')
         self.pub_ = rospy.Publisher('/hw/detected_handrail/pose', Pose, queue_size=10)
+        self.pub_non_transform = rospy.Publisher('/hw/detected_handrail/reference', PointCloud2, queue_size=10)
         self.pub_visualize = rospy.Publisher('/hw/detected_handrail/transform', PointCloud2, queue_size=10)
 
         # Define subscribers
@@ -70,6 +76,7 @@ class DOFPoseEstimator():
 
 
     def pointcloud_callback(self, points_msg):
+        start = timeit.default_timer()
         points_msg_world = self.align_transformer.dock_to_world_transform(points_msg)
 
         detected_handrail = self.align_transformer.convert_pc_msg_to_np(points_msg_world)
@@ -78,6 +85,7 @@ class DOFPoseEstimator():
 
         registered_handrail_o3d = o3d.io.read_point_cloud('/home/anaveen/Documents/nasa_ws/astrobee-detection-pipeline/src/handrail_segmentation/src/reference_pointclouds/handrail_30.pcd')
         registered_handrail = np.asarray(registered_handrail_o3d.points)
+        self.pub_non_transform.publish(convertPc2(registered_handrail, frame_id = "dock_cam"))
 
         rospy.loginfo("Running ICP to estimate 6 DOF pose of detected object")
         reg_p2p, visualize = execute_global_registration(registered_handrail_o3d, detected_handrail_o3d)
@@ -91,21 +99,29 @@ class DOFPoseEstimator():
         handrail_pose_msg.orientation.y = quat[1]
         handrail_pose_msg.orientation.z = quat[2]
         handrail_pose_msg.orientation.w = quat[3]
+
+        t = geometry_msgs.msg.TransformStamped()
+
+        t.header.stamp = rospy.Time.now()
+        t.header.frame_id = "dock_cam"
+        t.child_frame_id = "handrail"
+        t.transform.translation.x = reg_p2p.t[0]
+        t.transform.translation.y = reg_p2p.t[1]
+        t.transform.translation.z = reg_p2p.t[2]
+        t.transform.rotation.x = quat[0]
+        t.transform.rotation.y = quat[1]
+        t.transform.rotation.z = quat[2]
+        t.transform.rotation.w = quat[3]
+        self.br.sendTransform(t)
+        rospy.loginfo("Done")
         # handrail_pose_msg = self.align_transformer.transform_pose_estimate(handrail_pose_msg)
 
         self.pub_.publish(handrail_pose_msg)
-        print("=================================")
-        print(reg_p2p.t)
-        print(np.average(visualize, axis=0))
-        print(np.average(detected_handrail, axis = 0))
-        print("=================================")
-
-        self.pub_visualize.publish(convertPc2(visualize, frame_id = "world"))
-
+        self.pub_visualize.publish(convertPc2(visualize, frame_id = "dock_cam"))
+        stop = timeit.default_timer()
 
         rospy.loginfo("Done running ICP to estimate 6 DOF pose of detected object")
-
-
+        rospy.loginfo("~~~~~~~~~~~~~Pointcloud Registration took " + str(stop - start) + " seconds.~~~~~~~~~~~~~~~~")
 
 if __name__=="__main__":
     # Initialize node
