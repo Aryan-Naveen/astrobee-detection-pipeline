@@ -131,7 +131,7 @@ def main():
 
 
         if epoch % params.checkpoint_interval == 0 or epoch == num_epochs - 1:
-            checkpoint_path = f"checkpoints/mrcnn_ckpt_{epoch}.pth"
+            checkpoint_path = f"checkpoints/cargo_bag_{epoch}.pth"
             print(f"---- Saving checkpoint to: '{checkpoint_path}' ----")
             torch.save(model.state_dict(), checkpoint_path)
             evaluate(model, data_loader_test, device=device)
